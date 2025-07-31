@@ -12,5 +12,7 @@ namespace ParcelsService.Models
         public Parcel Parcel { get; set; }
         public decimal Cost { get; set; }
         public ParcelSize Size { get; set; }
+        public ShippingMethod Method { get; set; }
+        public decimal ShippingCost { get; set; }
     }
 }

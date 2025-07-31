@@ -33,11 +33,10 @@ namespace ParcelsTest
         {
             // Arrange
             var parcels = new List<Parcel>
-        {
-            new Parcel(80, 80, 80), // Large - 15
-            new Parcel(2, 2, 2),    // Small - 3
-            new Parcel(30, 30, 30)  // Medium - 8
-        };
+            {
+                new Parcel(30, 30, 30, ShippingMethod.Standard), // Small ¡ú Lower price
+                new Parcel(30, 30, 30, ShippingMethod.Speedy)     // Medium ¡ú More expensive
+            };
             var service = new ParcelService(parcels);
 
             // Act
@@ -45,8 +44,9 @@ namespace ParcelsTest
 
             // Assert
             Assert.NotNull(cheapest);
-            Assert.Equal(ParcelSize.Small, cheapest.Size);
-            Assert.Equal(3m, cheapest.Cost);
+            Assert.Equal(ParcelSize.Medium, cheapest.Size);
+            Assert.Equal(ShippingMethod.Standard, cheapest.Method);
+            Assert.Equal(cheapest.Cost, cheapest.ShippingCost); // No speed boost
         }
 
         [Fact]
@@ -65,6 +65,30 @@ namespace ParcelsTest
             Assert.Equal(ParcelSize.Small, quotes[0].Size);
             Assert.Equal(3m, quotes[0].Cost);
         }
+        [Fact]
+        public void GetShippingQuotes_ReturnsExpectedQuotes()
+        {
+            // Arrange
+            var parcels = new List<Parcel>
+            {
+                new Parcel(9, 9, 9, ShippingMethod.Standard), // Small
+                new Parcel(30, 30, 30, ShippingMethod.Speedy)     // Medium
+            };
+            var service = new ParcelService(parcels);
 
+            // Act
+            var quotes = service.GetQuotes().ToList();
+
+            // Assert
+            Assert.Equal(2, quotes.Count);
+
+            Assert.Equal(ParcelSize.Small, quotes[0].Size);
+            Assert.Equal(ShippingMethod.Standard, quotes[0].Method);
+            Assert.Equal(quotes[0].Cost * 1, quotes[0].ShippingCost);
+
+            Assert.Equal(ParcelSize.Medium, quotes[1].Size);
+            Assert.Equal(ShippingMethod.Speedy, quotes[1].Method);
+            Assert.Equal(quotes[1].Cost * 2, quotes[1].ShippingCost); // Speedy doubles the price
+        }
     }
 }

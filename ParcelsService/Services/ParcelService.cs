@@ -23,7 +23,9 @@ namespace ParcelsService.Services
                 yield return new ParcelQuote
                 {
                     Size = parcel.Size,
-                    Cost = parcel.Cost,
+                    Cost = parcel.DimensionCost,
+                    Method = parcel.Method,
+                    ShippingCost = parcel.DimensionShippingCost,
                     Parcel = parcel
                 };
             }
@@ -32,7 +34,7 @@ namespace ParcelsService.Services
         public ParcelQuote GetCheapestOption()
         {
             return this.GetQuotes()
-                .OrderBy(q => q.Cost)
+                .OrderBy(q => q.ShippingCost)
                 .FirstOrDefault();
         }
 

@@ -22,7 +22,7 @@ namespace ParcelsService.Extensions
                 return ParcelSize.Large; 
             throw new ArgumentNullException("Invalid parcel dimensions");
         }
-        public static decimal CalculatePrice(this Parcel parcel)
+        public static decimal CalculateDimensionPrice(this Parcel parcel)
         {
             return parcel.EvaluateSize() switch
             {
@@ -30,6 +30,15 @@ namespace ParcelsService.Extensions
                 ParcelSize.Medium => 8m,
                 ParcelSize.Large => 15m,
                 ParcelSize.XL => 25m,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+        public static decimal CalculateDimensionShippingPrice(this Parcel parcel)
+        {
+            return parcel.Method switch
+            {
+                ShippingMethod.Standard => parcel.DimensionCost,
+                ShippingMethod.Speedy =>parcel.DimensionCost * 2,
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
