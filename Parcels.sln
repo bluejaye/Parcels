@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParcelsService", "ParcelsService\ParcelsService.csproj", "{9A3AF4B6-5774-4167-B26C-31E692E4FFAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParcelsTest", "ParcelsTest\ParcelsTest.csproj", "{32E58FE2-248B-47F9-8CF3-315304E6CDF3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A3AF4B6-5774-4167-B26C-31E692E4FFAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A3AF4B6-5774-4167-B26C-31E692E4FFAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A3AF4B6-5774-4167-B26C-31E692E4FFAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A3AF4B6-5774-4167-B26C-31E692E4FFAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32E58FE2-248B-47F9-8CF3-315304E6CDF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32E58FE2-248B-47F9-8CF3-315304E6CDF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32E58FE2-248B-47F9-8CF3-315304E6CDF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32E58FE2-248B-47F9-8CF3-315304E6CDF3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4FB971C6-D027-4F30-BC33-44071C26F006}
+	EndGlobalSection
+EndGlobal
