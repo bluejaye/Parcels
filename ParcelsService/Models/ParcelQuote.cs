@@ -9,10 +9,13 @@ namespace ParcelsService.Models
 {
     public class ParcelQuote
     {
-        public Parcel Parcel { get; set; }
-        public decimal Cost { get; set; }
-        public ParcelSize Size { get; set; }
-        public ShippingMethod Method { get; set; }
-        public decimal ShippingCost { get; set; }
+        public Parcel Parcel { get; set; }                    
+        public ParcelSize Size { get; set; }                   
+        public ShippingMethod Method { get; set; }             
+        public decimal BaseCost { get; set; }                  
+        public decimal OverweightCharge { get; set; }          
+        public decimal SpeedySurcharge { get; set; }           
+        public decimal TotalCost => BaseCost + OverweightCharge + SpeedySurcharge;
+        public string StrategyName { get; set; }               
     }
 }

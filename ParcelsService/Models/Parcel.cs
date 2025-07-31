@@ -17,20 +17,14 @@ namespace ParcelsService.Models
         public decimal DimensionCost =>this.CalculateDimensionPrice();
         public decimal DimensionShippingCost =>this.CalculateDimensionShippingPrice();
         public ShippingMethod Method{ get; set; } = ShippingMethod.Standard;
-
-        public Parcel(decimal length, decimal width, decimal height)
+        public int WeightKg { get; internal set; }
+        public Parcel(decimal length, decimal width, decimal height, int weightKg, ShippingMethod method = ShippingMethod.Standard)
         {
             Length = length;
             Width = width;
             Height = height;
-            Method = ShippingMethod.Standard;
-        }
-        public Parcel(decimal length, decimal width, decimal height, ShippingMethod? method)
-        {
-            Length = length;
-            Width = width;
-            Height = height;
-            Method = method ?? ShippingMethod.Standard;
+            WeightKg = weightKg;
+            Method = method;
         }
     }
 }

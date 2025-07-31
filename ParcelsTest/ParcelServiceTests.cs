@@ -1,94 +1,70 @@
 using ParcelsService.Enums;
 using ParcelsService.Models;
 using ParcelsService.Services;
+using ParcelsService.Strategies;
 
 namespace ParcelsTest
 {
     public class ParcelServiceTests
     {
         [Fact]
-        public void GetQuotes_ReturnsExpectedQuotes()
+        public void DimensionBasedStrategy_ShouldMatchDimensionCost()
         {
-            // Arrange
-            var parcels = new List<Parcel>
-        {
-            new Parcel(10, 10, 10), // Medium
-            new Parcel(2, 2, 2),    // Small
-        };
-            var service = new ParcelService(parcels);
+            var parcel = new Parcel(length: 20m, width: 20m, height: 20m, weightKg: 2);
+            var strategy = new DimensionBasedStrategy();
 
-            // Act
-            var quotes = service.GetQuotes().ToList();
+            var cost = strategy.Calculate(parcel);
 
-            // Assert
-            Assert.Equal(2, quotes.Count);
-            Assert.Equal(ParcelSize.Medium, quotes[0].Size);
-            Assert.Equal(8m, quotes[0].Cost); // Cost from CalculatePrice()
-            Assert.Equal(ParcelSize.Small, quotes[1].Size);
-            Assert.Equal(3m, quotes[1].Cost);
+            Assert.Equal(parcel.DimensionCost, cost); 
         }
 
         [Fact]
-        public void GetCheapestOption_ReturnsSmallParcel()
+        public void SpeedyShippingDecorator_ShouldDoubleBaseCost()
         {
-            // Arrange
-            var parcels = new List<Parcel>
-            {
-                new Parcel(30, 30, 30, ShippingMethod.Standard), // Small ¡ú Lower price
-                new Parcel(30, 30, 30, ShippingMethod.Speedy)     // Medium ¡ú More expensive
-            };
-            var service = new ParcelService(parcels);
+            var parcel = new Parcel(length: 20m, width: 20m, height: 20m, weightKg: 2, method: ShippingMethod.Speedy);
+            var baseStrategy = new DimensionBasedStrategy();
+            var speedyStrategy = new SpeedyShippingDecorator(baseStrategy);
 
-            // Act
-            var cheapest = service.GetCheapestOption();
+            var expected = parcel.DimensionShippingCost; 
+            var result = speedyStrategy.Calculate(parcel);
 
-            // Assert
-            Assert.NotNull(cheapest);
-            Assert.Equal(ParcelSize.Medium, cheapest.Size);
-            Assert.Equal(ShippingMethod.Standard, cheapest.Method);
-            Assert.Equal(cheapest.Cost, cheapest.ShippingCost); // No speed boost
+            Assert.Equal(expected, result);
         }
 
         [Fact]
-        public void AddParcel_AppendsToParcelList()
+        public void OverweightChargeStrategy_ShouldReturnCorrectOverweightCost()
         {
-            // Arrange
-            var service = new ParcelService(new List<Parcel>());
-            var newParcel = new Parcel(5, 5, 5); // Small
+            var parcel = new Parcel(length: 40m, width: 30m, height: 30m, weightKg: 5);
 
-            // Act
-            service.AddParcel(newParcel);
-            var quotes = service.GetQuotes().ToList();
+            var strategy = new OverweightChargeStrategy();
+            var cost = strategy.Calculate(parcel);
 
-            // Assert
-            Assert.Single(quotes);
-            Assert.Equal(ParcelSize.Small, quotes[0].Size);
-            Assert.Equal(3m, quotes[0].Cost);
+            Assert.Equal(4m, cost);
         }
+
         [Fact]
-        public void GetShippingQuotes_ReturnsExpectedQuotes()
+        public void CombinedPricingStrategy_ShouldAggregate_Dimension_Overweight_AndSpeedyCharges()
         {
             // Arrange
-            var parcels = new List<Parcel>
-            {
-                new Parcel(9, 9, 9, ShippingMethod.Standard), // Small
-                new Parcel(30, 30, 30, ShippingMethod.Speedy)     // Medium
-            };
-            var service = new ParcelService(parcels);
+            var parcel = new Parcel(length: 50m, width: 50m, height: 50m, weightKg: 7, method: ShippingMethod.Speedy);
+
+            var baseStrategy = new DimensionBasedStrategy();                  
+            var overweightStrategy = new OverweightChargeStrategy();         
+            var speedyDecorator = new SpeedyShippingDecorator(baseStrategy); 
+
+            var strategy = new CombinedPricingStrategy(baseStrategy, overweightStrategy, speedyDecorator);
+
+            var dimensionCost = baseStrategy.Calculate(parcel);              
+            var overweightCost = overweightStrategy.Calculate(parcel);       
+            var speedyCost = speedyDecorator.Calculate(parcel);              
+
+            var expectedTotal = dimensionCost + overweightCost + speedyCost;
 
             // Act
-            var quotes = service.GetQuotes().ToList();
+            var actualTotal = strategy.Calculate(parcel);
 
             // Assert
-            Assert.Equal(2, quotes.Count);
-
-            Assert.Equal(ParcelSize.Small, quotes[0].Size);
-            Assert.Equal(ShippingMethod.Standard, quotes[0].Method);
-            Assert.Equal(quotes[0].Cost * 1, quotes[0].ShippingCost);
-
-            Assert.Equal(ParcelSize.Medium, quotes[1].Size);
-            Assert.Equal(ShippingMethod.Speedy, quotes[1].Method);
-            Assert.Equal(quotes[1].Cost * 2, quotes[1].ShippingCost); // Speedy doubles the price
+            Assert.Equal(expectedTotal, actualTotal);
         }
     }
 }

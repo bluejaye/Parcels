@@ -1,4 +1,5 @@
 ﻿using ParcelsService.Models;
+using ParcelsService.Strategies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,38 +10,32 @@ namespace ParcelsService.Services
 {
     public class ParcelService
     {
-        private readonly List<Parcel> _parcels;
+        private readonly IEnumerable<IPricingStrategy> _strategies;
 
-        public ParcelService(List<Parcel> parcels)
+        public ParcelService(IEnumerable<IPricingStrategy> strategies)
         {
-            _parcels = parcels;
+            _strategies = strategies;
         }
 
-        public IEnumerable<ParcelQuote> GetQuotes()
+        public IEnumerable<ParcelQuote> GetQuotes(Parcel parcel)
         {
-            foreach (var parcel in _parcels)
+            return _strategies.Select(strategy => new ParcelQuote
             {
-                yield return new ParcelQuote
-                {
-                    Size = parcel.Size,
-                    Cost = parcel.DimensionCost,
-                    Method = parcel.Method,
-                    ShippingCost = parcel.DimensionShippingCost,
-                    Parcel = parcel
-                };
-            }
+                Parcel = parcel,
+                Size = parcel.Size,                       
+                Method = parcel.Method,                   
+                BaseCost = strategy.Calculate(parcel),    
+                OverweightCharge = 0m,
+                SpeedySurcharge = 0m,
+                StrategyName = strategy.GetType().Name
+            });
         }
 
-        public ParcelQuote GetCheapestOption()
+        public ParcelQuote GetCheapestOption(Parcel parcel)
         {
-            return this.GetQuotes()
-                .OrderBy(q => q.ShippingCost)
+            return GetQuotes(parcel)
+                .OrderBy(q => q.TotalCost)
                 .FirstOrDefault();
-        }
-
-        public void AddParcel(Parcel parcel)
-        {
-            _parcels.Add(parcel);
         }
     }
 }
