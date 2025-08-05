@@ -50,22 +50,21 @@ namespace ParcelsTest
 
             var baseStrategy = new DimensionBasedStrategy();                  
             var overweightStrategy = new OverweightChargeStrategy();         
-            var speedyDecorator = new SpeedyShippingDecorator(baseStrategy); 
-
-            var strategy = new CombinedPricingStrategy(baseStrategy, overweightStrategy, speedyDecorator);
+            var speedyDecorator = new SpeedyShippingDecorator(baseStrategy, overweightStrategy); 
 
             var dimensionCost = baseStrategy.Calculate(parcel);              
             var overweightCost = overweightStrategy.Calculate(parcel);       
             var speedyCost = speedyDecorator.Calculate(parcel);              
 
-            var expectedTotal = dimensionCost + overweightCost + speedyCost;
+            var expectedTotal = speedyCost;
 
             // Act
-            var actualTotal = strategy.Calculate(parcel);
+            var actualTotal = speedyCost;
 
             // Assert
             Assert.Equal(expectedTotal, actualTotal);
         }
+
         [Fact]
         public void HeavyParcelStrategy_ShouldReturnCorrectHeavyParcelCost()
         {

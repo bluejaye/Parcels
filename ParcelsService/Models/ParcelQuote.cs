@@ -13,9 +13,11 @@ namespace ParcelsService.Models
         public ParcelSize Size { get; set; }                   
         public ShippingMethod Method { get; set; }             
         public decimal BaseCost { get; set; }                  
-        public decimal OverweightCharge { get; set; }          
+        public decimal OverweightCharge { get; set; }  
+        /// <summary>
+        /// Calculate total cost after shipping
+        /// </summary>
         public decimal SpeedySurcharge { get; set; }           
-        public decimal TotalCost => BaseCost + OverweightCharge + SpeedySurcharge;
-        public string StrategyName { get; set; }               
+        public decimal TotalCost =>  SpeedySurcharge;
     }
 }

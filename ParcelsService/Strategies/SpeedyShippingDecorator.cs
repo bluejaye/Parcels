@@ -10,16 +10,16 @@ namespace ParcelsService.Strategies
 {
     public class SpeedyShippingDecorator : IPricingStrategy
     {
-        private readonly IPricingStrategy _inner;
+        private readonly IPricingStrategy[] _strategies;
 
-        public SpeedyShippingDecorator(IPricingStrategy inner)
+        public SpeedyShippingDecorator(params IPricingStrategy[] strategies)
         {
-            _inner = inner;
+            _strategies = strategies;
         }
 
         public decimal Calculate(Parcel parcel)
         {
-            decimal baseCost = _inner.Calculate(parcel);
+            decimal baseCost = _strategies.Sum(strategy => strategy.Calculate(parcel));
             return parcel.Method == ShippingMethod.Speedy ? baseCost * 2 : baseCost;
         }
     }

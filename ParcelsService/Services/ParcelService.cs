@@ -17,25 +17,52 @@ namespace ParcelsService.Services
             _strategies = strategies;
         }
 
-        public IEnumerable<ParcelQuote> GetQuotes(Parcel parcel)
+        public ParcelQuote GetQuote(Parcel parcel)
         {
-            return _strategies.Select(strategy => new ParcelQuote
+            if (parcel.IsHeavy)
             {
-                Parcel = parcel,
-                Size = parcel.Size,                       
-                Method = parcel.Method,                   
-                BaseCost = strategy.Calculate(parcel),    
-                OverweightCharge = 0m,
-                SpeedySurcharge = 0m,
-                StrategyName = strategy.GetType().Name
-            });
+                var heavyParcelStrategy = new HeavyParcelStrategy();
+                var shippingDecorator = new SpeedyShippingDecorator(heavyParcelStrategy);
+
+                return new ParcelQuote
+                {
+                    Parcel = parcel,
+                    Size = parcel.Size,
+                    Method = parcel.Method,
+                    BaseCost = heavyParcelStrategy.Calculate(parcel),
+                    OverweightCharge = 0m,
+                    SpeedySurcharge = shippingDecorator.Calculate(parcel)
+                };
+            }
+            else
+            {
+                var baseStrategy = new DimensionBasedStrategy();
+                var overweightStrategy = new OverweightChargeStrategy();
+                var shippingDecorator = new SpeedyShippingDecorator(baseStrategy, overweightStrategy);
+
+                return new ParcelQuote
+                {
+                    Parcel = parcel,
+                    Size = parcel.Size,
+                    Method = parcel.Method,
+                    BaseCost = baseStrategy.Calculate(parcel),
+                    OverweightCharge = overweightStrategy.Calculate(parcel),
+                    SpeedySurcharge = shippingDecorator.Calculate(parcel)
+                };
+            }
         }
 
-        public ParcelQuote GetCheapestOption(Parcel parcel)
+        public IEnumerable<ParcelQuote> GetQuotes(IEnumerable<Parcel> parcels)
         {
-            return GetQuotes(parcel)
-                .OrderBy(q => q.TotalCost)
-                .FirstOrDefault();
+            return parcels.Select(parcel=> GetQuote(parcel));
         }
+
+        //This method will be availble when step 5 implemented.
+        //public ParcelQuote GetCheapestOption(Parcel parcel)
+        //{
+        //    return GetQuotes(parcel)
+        //        .OrderBy(q => q.TotalCost)
+        //        .FirstOrDefault();
+        //}
     }
 }
