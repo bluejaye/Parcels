@@ -13,6 +13,7 @@ namespace ParcelsService.Models
         public decimal Length { get; }
         public decimal Width { get; }
         public decimal Height { get; }
+        public bool IsHeavy => WeightKg >= 30;  //define if it is a heavy parcel, the hard code 30 should come from settings or DB
         public ParcelSize Size => this.EvaluateSize();
         public decimal DimensionCost =>this.CalculateDimensionPrice();
         public decimal DimensionShippingCost =>this.CalculateDimensionShippingPrice();

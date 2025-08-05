@@ -38,7 +38,7 @@ namespace ParcelsTest
 
             var strategy = new OverweightChargeStrategy();
             var cost = strategy.Calculate(parcel);
-
+            //overweight 2kg, for each kg add $2, then it's $4
             Assert.Equal(4m, cost);
         }
 
@@ -65,6 +65,24 @@ namespace ParcelsTest
 
             // Assert
             Assert.Equal(expectedTotal, actualTotal);
+        }
+        [Fact]
+        public void HeavyParcelStrategy_ShouldReturnCorrectHeavyParcelCost()
+        {
+            // Arrange
+            var parcel = new Parcel(length: 50m, width: 50m, height: 50m, weightKg: 52, method: ShippingMethod.Speedy);
+            var heavyParcelStrategy = new HeavyParcelStrategy();
+            var speedyDecorator = new SpeedyShippingDecorator(heavyParcelStrategy);
+
+            // Act
+            var heavyParcelCost = heavyParcelStrategy.Calculate(parcel);
+            var expectedCost = 52m;
+            var speedyCost = speedyDecorator.Calculate(parcel);
+            var expectedSpeedyCost = expectedCost * 2;
+
+            // Assert
+            Assert.Equal(expectedCost, heavyParcelCost);
+            Assert.Equal(expectedSpeedyCost, speedyCost);
         }
     }
 }
